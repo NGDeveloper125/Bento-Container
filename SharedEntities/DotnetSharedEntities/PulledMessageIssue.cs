@@ -1,5 +1,5 @@
 ﻿
-namespace MessageBusDomain.Entities;
+namespace DotnetSharedEntities;
 
 public enum PulledMessageIssue
 {

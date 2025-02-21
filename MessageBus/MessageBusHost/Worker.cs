@@ -6,19 +6,19 @@ namespace MessageBusHost;
 public class Worker(IConfiguration configuration,
                     ILogger<Worker> logger,
                     ILogger<MessageBus> messageBusLogger,
-                    ILogger<Embuser> embuserLogger,
-                    ILogger<Debuser> debuserLogger,
+                    ILogger<Enqueuer> enqueuerLogger,
+                    ILogger<Dequeuer> dequeuerLogger,
                     ILogger<RecoveryHandler> recoveryHandlerLogger) : BackgroundService
 {
     private readonly IConfiguration configuration = configuration;
     private readonly ILogger<Worker> logger = logger;
     private readonly ILogger<MessageBus> messageBusLogger = messageBusLogger;
-    private readonly ILogger<Embuser> embuserLogger = embuserLogger;
-    private readonly ILogger<Debuser> debuserLogger = debuserLogger;
+    private readonly ILogger<Enqueuer> enqueuerLogger = enqueuerLogger;
+    private readonly ILogger<Dequeuer> dequeuerLogger = dequeuerLogger;
     private readonly ILogger<RecoveryHandler> recoveryHandlerLogger = recoveryHandlerLogger;
     private MessageBus? messageBus;
-    private Task? embuserTask;
-    private Task? debuserTask;
+    private Task? enqueuerTask;
+    private Task? dequeuerTask;
 
     public override async Task StartAsync(CancellationToken cancellationToken)
     {
@@ -27,17 +27,17 @@ public class Worker(IConfiguration configuration,
             logger.LogInformation("Message Bus starting...");
             messageBus = new MessageBus(messageBusLogger, RecoveryHandler.LoadQueueMessages(recoveryHandlerLogger));
 
-            var embuserInfo = new EmbuserInfo(configuration["Embuser:Address"]!, configuration["Embuser:Port"]!);
-            var debuserInfo = new DebuserInfo(configuration["Debuser:Address"]!, configuration["Debuser:Port"]!);
+            var enqueuerInfo = new EnqueuerInfo(configuration["enqueuer:Address"]!, configuration["enqueuer:Port"]!);
+            var dequeuerInfo = new DequeuerInfo(configuration["dequeuer:Address"]!, configuration["dequeuer:Port"]!);
 
-            var embuser = new Embuser(embuserInfo, messageBus, embuserLogger);
-            var debuser = new Debuser(debuserInfo, messageBus, debuserLogger);
+            var enqueuer = new Enqueuer(enqueuerInfo, messageBus, enqueuerLogger);
+            var dequeuer = new Dequeuer(dequeuerInfo, messageBus, dequeuerLogger);
 
-            logger.LogInformation($"Embuser starting on {embuserInfo.Address.AddressString}:{embuserInfo.Port.PortNumber}");
-            embuserTask = Task.Run(() => { embuser.Run(cancellationToken); }, cancellationToken);
+            logger.LogInformation($"enqueuer starting on {enqueuerInfo.Address.AddressString}:{enqueuerInfo.Port.PortNumber}");
+            enqueuerTask = Task.Run(() => { enqueuer.Run(cancellationToken); }, cancellationToken);
 
-            logger.LogInformation($"Debuser starting on {debuserInfo.Address.AddressString}:{debuserInfo.Port.PortNumber}");
-            debuserTask = Task.Run(() => { debuser.Run(cancellationToken); }, cancellationToken);
+            logger.LogInformation($"dequeuer starting on {dequeuerInfo.Address.AddressString}:{dequeuerInfo.Port.PortNumber}");
+            dequeuerTask = Task.Run(() => { dequeuer.Run(cancellationToken); }, cancellationToken);
 
             await Task.FromResult(true);
         }
@@ -61,7 +61,7 @@ public class Worker(IConfiguration configuration,
     {
         logger.LogInformation("Message Bus stopping...");
         RecoveryHandler.SaveQueueMessages(messageBus!.Queue, recoveryHandlerLogger);
-        await Task.WhenAll(embuserTask!, debuserTask!);
+        await Task.WhenAll(enqueuerTask!, dequeuerTask!);
 
         logger.LogInformation("Message Bus stopped.");
         await base.StopAsync(cancellationToken);

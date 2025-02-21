@@ -2,12 +2,12 @@
 
 namespace MessageBusDomain.Entities;
 
-public class EmbuserInfo
+public class EnqueuerInfo
 {
     public Address Address { get; init; }
     public Port Port { get; init; }
 
-    public EmbuserInfo(string address, string port)
+    public EnqueuerInfo(string address, string port)
     {
         if (string.IsNullOrEmpty(address)) throw new ArgumentNullException(nameof(address));
         if (string.IsNullOrEmpty(port)) throw new ArgumentNullException(nameof(port));

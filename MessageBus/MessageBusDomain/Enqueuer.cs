@@ -7,16 +7,16 @@ using NetMQ;
 
 namespace MessageBusDomain;
 
-public class Embuser(EmbuserInfo embuserInfo, MessageBus messageBus, ILogger<Embuser> logger)
+public class Enqueuer(EnqueuerInfo enqueuerInfo, MessageBus messageBus, ILogger<Enqueuer> logger)
 {
     private readonly MessageBus messageBus = messageBus;
-    private readonly EmbuserInfo embuserInfo = embuserInfo;
-    private readonly ILogger<Embuser> logger = logger;
+    private readonly EnqueuerInfo enqueuerInfo = enqueuerInfo;
+    private readonly ILogger<Enqueuer> logger = logger;
 
     public void Run(CancellationToken cancellationToken)
     {
-        using var socket = new RouterSocket($"{embuserInfo.Address.AddressString}:{embuserInfo.Port.PortNumber}");
-        logger.LogInformation("Embuser is now listening for messages");
+        using var socket = new RouterSocket($"{enqueuerInfo.Address.AddressString}:{enqueuerInfo.Port.PortNumber}");
+        logger.LogInformation("enqueuer is now listening for messages");
         while (!cancellationToken.IsCancellationRequested)
         {
             try
