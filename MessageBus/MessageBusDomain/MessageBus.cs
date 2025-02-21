@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using MessageBusDomain.Entities;
+using DotnetSharedEntities;
 namespace MessageBusDomain;
 
 public class MessageBus
@@ -39,7 +40,7 @@ public class MessageBus
         logger.LogDebug($"Currently there are {queueInfo2.QueueCount} messages in the queue");
     }
 
-    public PulledMessage HandleRequestMessage(RequestMsssage requestMsssage)
+    public PulledMessage HandleRequestMessage(RequestMessage requestMsssage)
     {
         logger.LogDebug("Handling new request message");
         QueueMessage? queueMessage;
