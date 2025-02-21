@@ -5,7 +5,7 @@ namespace MessageBusHost;
 
 public class RecoveryHandler
 {
-    public static void SaveQueueMessages(List<QueueMessage> messages, ILogger<RecoveryHandler> logger)
+    public static void SaveQueueMessages(List<QueueMessage> messages, ILogger logger)
     {
         string serilizedMessages = JsonSerializer.Serialize(messages);
         try
@@ -18,7 +18,7 @@ public class RecoveryHandler
         }
     }
 
-    public static List<QueueMessage> LoadQueueMessages(ILogger<RecoveryHandler> logger)
+    public static List<QueueMessage> LoadQueueMessages(ILogger logger)
     {
         try
         {

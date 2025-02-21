@@ -20,8 +20,9 @@ Log.Logger = new LoggerConfiguration()
 
 builder.Logging.ClearProviders();
 builder.Logging.AddSerilog();
+builder.Services.AddSingleton<Microsoft.Extensions.Logging.ILogger>(sp =>
+    sp.GetRequiredService<ILoggerFactory>().CreateLogger("DefaultLogger"));
 builder.Services.AddHostedService<Worker>();
-builder.Services.AddSingleton<LoggerManager>();
 
 var host = builder.Build();
 
