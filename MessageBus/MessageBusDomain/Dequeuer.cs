@@ -5,20 +5,21 @@ using System.Text.Json;
 using NetMQ.Sockets;
 using NetMQ;
 using System.Collections.Concurrent;
+using DotnetSharedEntities;
 
 namespace MessageBusDomain;
 
-public class Debuser(DebuserInfo debuserInfo, MessageBus messageBus, ILogger<Debuser> logger)
+public class Dequeuer(DequeuerInfo dequeuerInfo, MessageBus messageBus, ILogger<Dequeuer> logger)
 {
     private readonly MessageBus messageBus = messageBus;
-    private readonly DebuserInfo debuserInfo = debuserInfo;
-    private readonly ILogger<Debuser> logger = logger;
+    private readonly DequeuerInfo dequeuerInfo = dequeuerInfo;
+    private readonly ILogger<Dequeuer> logger = logger;
     private readonly ConcurrentDictionary<RoutingKey, TaskCompletionSource<PulledMessage>> requestCompletionSources = new();
 
     public void Run(CancellationToken cancellationToken)
     {
-        using var socket = new RouterSocket($"{debuserInfo.Address.AddressString}:{debuserInfo.Port.PortNumber}");
-        logger.LogInformation("Debuser is now listning for messages");
+        using var socket = new RouterSocket($"{dequeuerInfo.Address.AddressString}:{dequeuerInfo.Port.PortNumber}");
+        logger.LogInformation("dequeuer is now listning for messages");
         while (!cancellationToken.IsCancellationRequested)
         {
             try
@@ -58,22 +59,22 @@ public class Debuser(DebuserInfo debuserInfo, MessageBus messageBus, ILogger<Deb
 
     public PulledMessage HandleNewRequestMessage(byte[] message)
     {
-        RequestMsssage? requestMsssage = null;
+        RequestMessage? requestMessage = null;
         try
         {
             string serializedMessage = Encoding.UTF8.GetString(message);
-            requestMsssage = JsonSerializer.Deserialize<RequestMsssage>(serializedMessage);
+            requestMessage = JsonSerializer.Deserialize<RequestMessage>(serializedMessage);
         }
         catch
         {
             logger.LogDebug("Failed to deserialize message");
         }
-        if (requestMsssage is null)
+        if (requestMessage is null)
         {
             logger.LogDebug("Message was not valid");
             return new PulledMessage(false, null!, PulledMessageIssue.FailedToDeSerializeMessage);
         }
-        return messageBus.HandleRequestMessage(requestMsssage);
+        return messageBus.HandleRequestMessage(requestMessage);
     }
 }
 

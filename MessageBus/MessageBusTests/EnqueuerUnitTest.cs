@@ -7,18 +7,18 @@ using System.Text;
 
 namespace MessageBusTests;
 
-public class EmbuserUnitTests
+public class enqueuerUnitTests
 {
     private readonly MessageBus messageBus;
-    private readonly Embuser embuser;
+    private readonly Enqueuer enqueuer;
 
-    public EmbuserUnitTests()
+    public enqueuerUnitTests()
     {
         ILogger<MessageBus> logger = NSubstitute.Substitute.For<ILogger<MessageBus>>();
-        ILogger<Embuser> embuserLogger = NSubstitute.Substitute.For<ILogger<Embuser>>();
+        ILogger<Enqueuer> enqueuerLogger = NSubstitute.Substitute.For<ILogger<Enqueuer>>();
         messageBus = new MessageBus(logger, []);
-        var pushSocketInfo = new EmbuserInfo("0.0.0.0", "5555");
-        embuser = new Embuser(pushSocketInfo, messageBus, embuserLogger);
+        var pushSocketInfo = new EnqueuerInfo("0.0.0.0", "5555");
+        enqueuer = new Enqueuer(pushSocketInfo, messageBus, enqueuerLogger);
     }
 
     [Fact]
@@ -28,7 +28,7 @@ public class EmbuserUnitTests
         string serializedMessage = JsonSerializer.Serialize(messageWrapper);
         byte[] buffer = Encoding.UTF8.GetBytes(serializedMessage);
 
-        embuser.HandleNewMessage(buffer);
+        enqueuer.HandleNewMessage(buffer);
         QueueInfo queueInfo = messageBus.GetQueueInfo();
 
         queueInfo.QueueCount.Should().Be(0);
@@ -41,7 +41,7 @@ public class EmbuserUnitTests
         string serializedMessage = JsonSerializer.Serialize(messageWrapper);
         byte[] buffer = Encoding.UTF8.GetBytes(serializedMessage);
 
-        embuser.HandleNewMessage(buffer);
+        enqueuer.HandleNewMessage(buffer);
         QueueInfo queueInfo = messageBus.GetQueueInfo();
 
         queueInfo.QueueCount.Should().Be(0);
@@ -56,7 +56,7 @@ public class EmbuserUnitTests
         string serializedMessage = JsonSerializer.Serialize(messageWrapper);
         byte[] buffer = Encoding.UTF8.GetBytes(serializedMessage);
 
-        embuser.HandleNewMessage(buffer);
+        enqueuer.HandleNewMessage(buffer);
         await Task.Delay(1000);
 
         QueueInfo queueInfo = messageBus.GetQueueInfo();
@@ -71,7 +71,7 @@ public class EmbuserUnitTests
         string serializedMessage = JsonSerializer.Serialize(messageWrapper);
         byte[] buffer = Encoding.UTF8.GetBytes(serializedMessage);
 
-        embuser.HandleNewMessage(buffer);
+        enqueuer.HandleNewMessage(buffer);
         await Task.Delay(1000);
 
         QueueInfo queueInfo = messageBus.GetQueueInfo();
