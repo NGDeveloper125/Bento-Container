@@ -3,10 +3,9 @@ using MessageBusDomain.Entities;
 
 namespace MessageBusHost;
 
-public class Worker(IConfiguration configuration, LoggerManager loggerManager) : BackgroundService
+public class Worker(IConfiguration configuration, ILogger logger) : BackgroundService
 {
     private readonly IConfiguration configuration = configuration;
-    private readonly ILogger<Worker> logger = loggerManager.WrokerLogger;
     private MessageBus? messageBus;
     private Task? enqueuerTask;
     private Task? dequeuerTask;
@@ -16,13 +15,13 @@ public class Worker(IConfiguration configuration, LoggerManager loggerManager) :
         try
         {
             logger.LogInformation("Message Bus starting...");
-            messageBus = new MessageBus(loggerManager.MessageBusLogger, RecoveryHandler.LoadQueueMessages(loggerManager.RecoveryHandlerLogger));
+            messageBus = new MessageBus(logger, RecoveryHandler.LoadQueueMessages(logger));
 
             var enqueuerInfo = new EnqueuerInfo(configuration["enqueuer:Address"]!, configuration["enqueuer:Port"]!);
             var dequeuerInfo = new DequeuerInfo(configuration["dequeuer:Address"]!, configuration["dequeuer:Port"]!);
 
-            var enqueuer = new Enqueuer(enqueuerInfo, messageBus, loggerManager.EnqueuerLogger);
-            var dequeuer = new Dequeuer(dequeuerInfo, messageBus, loggerManager.DequeuerLogger);
+            var enqueuer = new Enqueuer(enqueuerInfo, messageBus, logger);
+            var dequeuer = new Dequeuer(dequeuerInfo, messageBus, logger);
 
             logger.LogInformation($"enqueuer starting on {enqueuerInfo.Address.AddressString}:{enqueuerInfo.Port.PortNumber}");
             enqueuerTask = Task.Run(() => { enqueuer.Run(cancellationToken); }, cancellationToken);
@@ -51,7 +50,7 @@ public class Worker(IConfiguration configuration, LoggerManager loggerManager) :
     public override async Task StopAsync(CancellationToken cancellationToken)
     {
         logger.LogInformation("Message Bus stopping...");
-        RecoveryHandler.SaveQueueMessages(messageBus!.Queue, loggerManager.RecoveryHandlerLogger);
+        RecoveryHandler.SaveQueueMessages(messageBus!.Queue, logger);
         await Task.WhenAll(enqueuerTask!, dequeuerTask!);
 
         logger.LogInformation("Message Bus stopped.");

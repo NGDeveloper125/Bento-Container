@@ -8,11 +8,11 @@ using DotnetSharedEntities;
 
 namespace MessageBusDomain;
 
-public class Enqueuer(EnqueuerInfo enqueuerInfo, MessageBus messageBus, ILogger<Enqueuer> logger)
+public class Enqueuer(EnqueuerInfo enqueuerInfo, MessageBus messageBus, ILogger logger)
 {
     private readonly MessageBus messageBus = messageBus;
     private readonly EnqueuerInfo enqueuerInfo = enqueuerInfo;
-    private readonly ILogger<Enqueuer> logger = logger;
+    private readonly ILogger logger = logger;
 
     public void Run(CancellationToken cancellationToken)
     {

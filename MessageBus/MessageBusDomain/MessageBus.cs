@@ -5,9 +5,9 @@ namespace MessageBusDomain;
 
 public class MessageBus
 {
-    private readonly ILogger<MessageBus> logger;
+    private readonly ILogger logger;
     public List<QueueMessage> Queue { get; private set; }
-    public MessageBus(ILogger<MessageBus> logger, List<QueueMessage> previousMessages)
+    public MessageBus(ILogger logger, List<QueueMessage> previousMessages)
     {
         this.logger = logger;
         Queue = [];
@@ -40,19 +40,19 @@ public class MessageBus
         logger.LogDebug($"Currently there are {queueInfo2.QueueCount} messages in the queue");
     }
 
-    public PulledMessage HandleRequestMessage(RequestMessage requestMsssage)
+    public PulledMessage HandleRequestMessage(RequestMessage requestMessage)
     {
         logger.LogDebug("Handling new request message");
         QueueMessage? queueMessage;
-        if ((requestMsssage.Topic == null || requestMsssage.Topic == "") && requestMsssage.Id == null)
+        if ((requestMessage.Topic == null || requestMessage.Topic == "") && requestMessage.Id == null)
         {
             logger.LogDebug("No topic or id provided");
             return new PulledMessage(false, null!, PulledMessageIssue.NoTopicOrIdProvided);
         }
 
-        if (requestMsssage.Id is not null)
+        if (requestMessage.Id is not null)
         {
-            queueMessage = QueueHandler.GetMessageById(Queue, requestMsssage.Id);
+            queueMessage = QueueHandler.GetMessageById(Queue, requestMessage.Id);
             if (queueMessage != null)
             {
                 logger.LogDebug("Message found by id");
@@ -63,7 +63,7 @@ public class MessageBus
             return new PulledMessage(false, null!, PulledMessageIssue.NoMessageFoundWithThisId);
         }
 
-        queueMessage = QueueHandler.GetNextMessageByTopic(Queue, requestMsssage.Topic!);
+        queueMessage = QueueHandler.GetNextMessageByTopic(Queue, requestMessage.Topic!);
 
         if (queueMessage != null)
         {

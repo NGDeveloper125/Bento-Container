@@ -9,11 +9,11 @@ using DotnetSharedEntities;
 
 namespace MessageBusDomain;
 
-public class Dequeuer(DequeuerInfo dequeuerInfo, MessageBus messageBus, ILogger<Dequeuer> logger)
+public class Dequeuer(DequeuerInfo dequeuerInfo, MessageBus messageBus, ILogger logger)
 {
     private readonly MessageBus messageBus = messageBus;
     private readonly DequeuerInfo dequeuerInfo = dequeuerInfo;
-    private readonly ILogger<Dequeuer> logger = logger;
+    private readonly ILogger logger = logger;
     private readonly ConcurrentDictionary<RoutingKey, TaskCompletionSource<PulledMessage>> requestCompletionSources = new();
 
     public void Run(CancellationToken cancellationToken)
