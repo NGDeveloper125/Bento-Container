@@ -4,15 +4,16 @@ using Microsoft.Extensions.Logging;
 using MessageBusDomain.Entities;
 using System.Text.Json;
 using System.Text;
+using DotnetSharedEntities;
 
 namespace MessageBusTests;
 
-public class enqueuerUnitTests
+public class EnqueuerUnitTests
 {
     private readonly MessageBus messageBus;
     private readonly Enqueuer enqueuer;
 
-    public enqueuerUnitTests()
+    public EnqueuerUnitTests()
     {
         ILogger<MessageBus> logger = NSubstitute.Substitute.For<ILogger<MessageBus>>();
         ILogger<Enqueuer> enqueuerLogger = NSubstitute.Substitute.For<ILogger<Enqueuer>>();

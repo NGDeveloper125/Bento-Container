@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using MessageBusDomain.Entities;
 using System.Text.Json;
 using System.Text;
+using DotnetSharedEntities;
 
 namespace MessageBusTests;
 
@@ -25,7 +26,7 @@ public class DequeuerUnitTests
     [Fact]
     public void HandleNewRequestMessage_ReturnIssueMessage_WhenMessageFailedToDeserialized()
     {
-        string serializedMessage = JsonSerializer.Serialize("requestMsssage");
+        string serializedMessage = JsonSerializer.Serialize("requestMessage");
         byte[] message = Encoding.UTF8.GetBytes(serializedMessage);
 
         PulledMessage pulledMessage = dequeuer.HandleNewRequestMessage(message);
@@ -37,8 +38,8 @@ public class DequeuerUnitTests
     [Fact]
     public void HandleNewRequestMessage_ReturnIssueMessage_WhenTopicAndIdAreNotValid()
     {
-        var requestMsssage = new RequestMsssage("", null);
-        string serializedMessage = JsonSerializer.Serialize(requestMsssage);
+        var requestMessage = new RequestMessage("", null);
+        string serializedMessage = JsonSerializer.Serialize(requestMessage);
         byte[] message = Encoding.UTF8.GetBytes(serializedMessage);
 
         PulledMessage pulledMessage = dequeuer.HandleNewRequestMessage(message);
@@ -52,8 +53,8 @@ public class DequeuerUnitTests
     public void HandleNewRequestMessage_ReturnIssueMessage_WhenIdIsValidButNotExistInTheQueue()
     {
         Guid id = Guid.NewGuid();
-        var requestMsssage = new RequestMsssage("", id);
-        string serializedMessage = JsonSerializer.Serialize(requestMsssage);
+        var requestMessage = new RequestMessage("", id);
+        string serializedMessage = JsonSerializer.Serialize(requestMessage);
         byte[] message = Encoding.UTF8.GetBytes(serializedMessage);
 
         PulledMessage pulledMessage = dequeuer.HandleNewRequestMessage(message);
@@ -69,8 +70,8 @@ public class DequeuerUnitTests
         Guid id = Guid.NewGuid();
         var messageWrapper = new MessageWrapper("test", "payload", id);
         messageBus.HandleNewMessage(messageWrapper);
-        var requestMsssage = new RequestMsssage("", id);
-        string serializedMessage = JsonSerializer.Serialize(requestMsssage);
+        var requestMessage = new RequestMessage("", id);
+        string serializedMessage = JsonSerializer.Serialize(requestMessage);
         byte[] message = Encoding.UTF8.GetBytes(serializedMessage);
 
         PulledMessage pulledMessage = dequeuer.HandleNewRequestMessage(message);
@@ -83,8 +84,8 @@ public class DequeuerUnitTests
     [Fact]
     public void HandleNewRequestMessage_ReturnIssueMessage_WhenTopicIsValidButNotExistInQueue()
     {
-        var requestMsssage = new RequestMsssage("topic", null);
-        string serializedMessage = JsonSerializer.Serialize(requestMsssage);
+        var requestMessage = new RequestMessage("topic", null);
+        string serializedMessage = JsonSerializer.Serialize(requestMessage);
         byte[] message = Encoding.UTF8.GetBytes(serializedMessage);
 
         PulledMessage pulledMessage = dequeuer.HandleNewRequestMessage(message);
@@ -99,8 +100,8 @@ public class DequeuerUnitTests
     {
         var messageWrapper = new MessageWrapper("Topic", "payload", null);
         messageBus.HandleNewMessage(messageWrapper);
-        var requestMsssage = new RequestMsssage("Topic", null);
-        string serializedMessage = JsonSerializer.Serialize(requestMsssage);
+        var requestMessage = new RequestMessage("Topic", null);
+        string serializedMessage = JsonSerializer.Serialize(requestMessage);
         byte[] message = Encoding.UTF8.GetBytes(serializedMessage);
 
         PulledMessage pulledMessage = dequeuer.HandleNewRequestMessage(message);

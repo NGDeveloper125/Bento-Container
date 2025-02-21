@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MessageBusDomain", "Message
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MessageBusTests", "MessageBusTests\MessageBusTests.csproj", "{3BF0FA53-E5B1-4E1C-A914-DCC5B63E0125}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DotnetSharedEntities", "..\SharedEntities\DotnetSharedEntities\DotnetSharedEntities.csproj", "{B40A2719-FE08-4B33-B376-C86CC10F9A45}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{3BF0FA53-E5B1-4E1C-A914-DCC5B63E0125}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3BF0FA53-E5B1-4E1C-A914-DCC5B63E0125}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3BF0FA53-E5B1-4E1C-A914-DCC5B63E0125}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B40A2719-FE08-4B33-B376-C86CC10F9A45}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B40A2719-FE08-4B33-B376-C86CC10F9A45}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B40A2719-FE08-4B33-B376-C86CC10F9A45}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B40A2719-FE08-4B33-B376-C86CC10F9A45}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

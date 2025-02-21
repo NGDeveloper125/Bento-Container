@@ -1,9 +1,9 @@
 {
-    "Embuser": {
+    "Enqueuer": {
       "Address": "localhost",
       "Port": "5555"
     },
-    "Debuser": {
+    "Dequeuer": {
       "Address": "localhost",
       "Port": "5556"
     },
