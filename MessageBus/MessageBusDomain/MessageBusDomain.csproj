@@ -11,4 +11,8 @@
     <PackageReference Include="NetMQ" Version="4.0.1.13" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\SharedEntities\DotnetSharedEntities\DotnetSharedEntities.csproj" />
+  </ItemGroup>
+
 </Project>

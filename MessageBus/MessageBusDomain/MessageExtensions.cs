@@ -1,4 +1,5 @@
 ﻿
+using DotnetSharedEntities;
 using MessageBusDomain.Entities;
 
 namespace MessageBusDomain;

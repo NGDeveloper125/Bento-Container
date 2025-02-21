@@ -4,6 +4,7 @@ using System.Text.Json;
 using System.Text;
 using NetMQ.Sockets;
 using NetMQ;
+using DotnetSharedEntities;
 
 namespace MessageBusDomain;
 
