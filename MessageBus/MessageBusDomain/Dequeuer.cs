@@ -5,7 +5,7 @@ using System.Text.Json;
 using NetMQ.Sockets;
 using NetMQ;
 using System.Collections.Concurrent;
-using DotnetSharedEntities;
+using DotnetSharedEntities.MessageBusModels;
 
 namespace MessageBusDomain;
 

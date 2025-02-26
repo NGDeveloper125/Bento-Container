@@ -1,5 +1,4 @@
-﻿
-namespace DotnetSharedEntities;
+﻿namespace DotnetSharedEntities.MessageBusModels;
 
 public enum PulledMessageIssue
 {

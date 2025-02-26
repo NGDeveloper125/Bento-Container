@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using MessageBusDomain.Entities;
-using DotnetSharedEntities;
+using DotnetSharedEntities.MessageBusModels;
 namespace MessageBusDomain;
 
 public class MessageBus
