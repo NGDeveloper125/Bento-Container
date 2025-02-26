@@ -1,4 +1,5 @@
 using DotnetSharedEntities;
+using DotnetSharedEntities.MessageBusModels;
 using FluentAssertions;
 using MessageBusDomain;
 using MessageBusDomain.Entities;

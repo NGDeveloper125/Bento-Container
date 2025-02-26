@@ -1,37 +1,54 @@
 {
-    "Enqueuer": {
-      "Address": "localhost",
-      "Port": "5555"
+    "ContainerName" : "TestContainer",
+    "ContainerPort" : "1234",
+    "BaseImage": {
+        "Platform": "Linux",
+        "ImageType": "UbuntuLatest",
+        "CustomBaseImage": null
     },
-    "Dequeuer": {
-      "Address": "localhost",
-      "Port": "5556"
-    },
-    "Serilog": {
-      "Using": [
-        "Serilog.Sinks.File"
-      ],
-      "MinimumLevel": {
-        "Default": "Debug",
-        "Override": {
-          "Microsoft": "Warning",
-          "System": "Warning"
-        }
-      },
-      "WriteTo": [
+    "Services" : [
         {
-          "Name": "File",
-          "Args": {
-            "path": "logs/log-.txt",
-            "rollingInterval": "Day",
-            "outputTemplate": "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level}] {Message}{NewLine}{Exception}"
-          }
+            "ServiceName" : "MessageBusHost",
+            "ServiceType" : "dotnet",
+            "ServiceLocation" : "../MessageBus/MessageBusHost/",
+            "Dependencies" : [
+                "dotnet sdk"
+            ],
+            "Enqueuer": {
+                "Address": "localhost",
+                "Port": "5555"
+            },
+            "Dequeuer": {
+                "Address": "localhost",
+                "Port": "5556"
+            },
+            "Serilog": {
+                "Using": [
+                    "Serilog.Sinks.File"
+                ],
+                "MinimumLevel": {
+                    "Default": "Debug",
+                    "Override": {
+                    "Microsoft": "Warning",
+                    "System": "Warning"
+                    }
+                },
+                "WriteTo": [
+                    {
+                    "Name": "File",
+                    "Args": {
+                        "path": "logs/log-.txt",
+                        "rollingInterval": "Day",
+                        "outputTemplate": "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level}] {Message}{NewLine}{Exception}"
+                    }
+                    }
+                ],
+            "Enrich": [
+                "FromLogContext",
+                "WithMachineName",
+                "WithThreadId"
+                ]
+            }
         }
-      ],
-      "Enrich": [
-        "FromLogContext",
-        "WithMachineName",
-        "WithThreadId"
-      ]
-    }
+    ]
   }

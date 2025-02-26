@@ -5,6 +5,7 @@ using MessageBusDomain.Entities;
 using System.Text.Json;
 using System.Text;
 using DotnetSharedEntities;
+using DotnetSharedEntities.MessageBusModels;
 
 namespace MessageBusTests;
 
