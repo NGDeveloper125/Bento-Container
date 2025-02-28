@@ -1,4 +1,6 @@
-# Bento Container
+<img src="./Assets/Icons/High-Resolution-Color-Logo.png" width="150" height="150" alt=""><img src="./Assets/Icons/High-Resolution-Logo-White-on-Black-Background.png" width="150" height="150" alt=""><img src="./Assets/Icons/High-Resolution-Color-Logo-on-Transparent-Background.png" width="150" height="150" alt="">
+
+# Bento Container 
 
 Bento Container is an open-source, containerized environment designed for microservices with an integrated message bus system. It provides a seamless, multi-language development experience with built-in messaging capabilities.
 
