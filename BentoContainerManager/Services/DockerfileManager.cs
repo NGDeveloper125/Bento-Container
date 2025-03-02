@@ -10,7 +10,10 @@ public class DockerfileManager
     {
         // Read configuration
         container.RegisteredDependencies = DependenciesHandler.HandleDependencies(container.Services, container.BaseImage.Platform);
-        container.Services = await ServicesHandler.HandleServices(container.Services);
+        IEnumerable<Project> handledServices = await ProjectsHandler.HandleProjects(container.Services);
+        container.Services = handledServices.OfType<Service>().ToList();
+        IEnumerable<Project> handledTestProjects = await ProjectsHandler.HandleProjects(container.Tests);
+        container.Tests = handledTestProjects.OfType<TestProject>().ToList();
 
         // Log gathered information
         Console.WriteLine($"Container Name: {container.ContainerName}");
@@ -19,7 +22,9 @@ public class DockerfileManager
         Console.WriteLine($" Platform - {container.BaseImage.Platform}");
         Console.WriteLine($" Image - {container.BaseImage.ImageType}");
         Console.WriteLine("Services:");
-        container.Services.ForEach(svc => Console.WriteLine($" Service name - {svc.ServiceName} | Service location - {svc.ServiceLocation}"));
+        container.Services.ForEach(svc => Console.WriteLine($" Service name - {svc.ProjectName} | Service location - {svc.ProjectLocation}"));
+        Console.WriteLine("Tests:");
+        container.Tests.ForEach(test => Console.WriteLine($" Test name - {test.ProjectName} | Test location - {test.ProjectLocation}"));
         Console.WriteLine("Dependencies:");
         container.RegisteredDependencies.ForEach(dep => Console.WriteLine($"  - {dep}"));
         return container;
@@ -47,9 +52,22 @@ public class DockerfileManager
         // Copy published services
         foreach (var service in container.Services)
         {
-            var serviceName = service.ServiceName;
-            dockerfileContent.Add($"# Copy {service.ServiceName}");
+            Console.WriteLine($"Adding {service.ProjectName} to docker file");
+            var serviceName = service.ProjectName;
+            dockerfileContent.Add($"# Copy {service.ProjectName}");
             dockerfileContent.Add($"COPY publish/{serviceName} /app/Services/{serviceName}");
+            dockerfileContent.Add("");
+        }
+
+        // Copy published tests
+
+        Console.WriteLine($"container tests: {container.Tests.Count}");
+        foreach (var test in container.Tests)
+        {
+            Console.WriteLine($"Adding {test.ProjectName} to docker file");
+            var testName = test.ProjectName;
+            dockerfileContent.Add($"# Copy {test.ProjectName}");
+            dockerfileContent.Add($"COPY publish/{testName} /app/Tests/{testName}");
             dockerfileContent.Add("");
         }
 

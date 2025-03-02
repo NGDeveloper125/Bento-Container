@@ -1,5 +1,5 @@
 using DotnetSharedEntities;
-using DotnetSharedEntities.ConfigurationModels;
+using DotnetSharedEntities.MessageBusModels;
 using MessageBusDomain;
 using MessageBusDomain.Entities;
 
@@ -19,7 +19,7 @@ public class Worker(IConfiguration configuration, ILogger logger) : BackgroundSe
             logger.LogInformation("Message Bus starting...");
             messageBus = new MessageBus(logger, RecoveryHandler.LoadQueueMessages(logger));
 
-            (EnqueuerInfo enqueuerInfo, DequeuerInfo dequeuerInfo) = GetQueuesInfo();
+            (EnqueuerInfo enqueuerInfo, DequeuerInfo dequeuerInfo) = GetMessageBusInfo(configuration);
 
             var enqueuer = new Enqueuer(enqueuerInfo, messageBus, logger);
             var dequeuer = new Dequeuer(dequeuerInfo, messageBus, logger);
@@ -39,15 +39,19 @@ public class Worker(IConfiguration configuration, ILogger logger) : BackgroundSe
         }
     }
 
-    private (EnqueuerInfo enqueuerInfo, DequeuerInfo dequeuerInfo) GetQueuesInfo()
+    private static (EnqueuerInfo enqueuerInfo, DequeuerInfo dequeuerInfo) GetMessageBusInfo(IConfiguration configuration)
     {
-        ServiceConfig? serviceConfig = ConfigurationHandler.GetServiceFromConfiguration(configuration, "MessageBusHost");
-        return serviceConfig is not null ?
-                          (new EnqueuerInfo(serviceConfig.Enqueuer.Address!, serviceConfig.Enqueuer.Port!),
-                            new DequeuerInfo(serviceConfig.Dequeuer.Address!, serviceConfig.Dequeuer.Port!)) :
-                          throw new Exception($"Failed to fetch service configuraition for MessageBus");
+        string? enqueuerAddress = configuration["MessageBus:Enqueuer:Address"]
+                                    ?? throw new ArgumentNullException("Failed to find enqueuer address for message bus");
+        string? enqueuerPort = configuration["MessageBus:Enqueuer:Port"]
+                                    ?? throw new ArgumentNullException("Failed to find enqueuer port for message bus");
+        string? dequeuerAddress = configuration["MessageBus:Dequeuer:Address"]
+                                    ?? throw new ArgumentNullException("Failed to find dequeuer address for message bus");
+        string? dequeuerPort = configuration["MessageBus:Dequeuer:Port"]
+                                    ?? throw new ArgumentNullException("Failed to find dequeuer port for message bus");
 
-
+        return (new EnqueuerInfo(enqueuerAddress!, enqueuerPort!),
+                new DequeuerInfo(dequeuerAddress!, dequeuerPort!));
     }
 
     protected override async Task ExecuteAsync(CancellationToken cancellationToken)

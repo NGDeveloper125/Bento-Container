@@ -107,6 +107,7 @@ public class Program
             }
 
             Console.WriteLine($"Processing {container.ContainerName} configuration");
+            Console.WriteLine($"Container contain: {container.Services.Count} services and {container.Tests.Count} tests");
             return container;
         }
         catch (Exception ex)

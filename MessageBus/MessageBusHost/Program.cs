@@ -1,21 +1,20 @@
+using DotnetSharedEntities;
+using DotnetSharedEntities.ConfigurationModels;
 using MessageBusHost;
 using Serilog;
-using System.Diagnostics;
 
 HostApplicationBuilder builder = Host.CreateApplicationBuilder(args);
 
 string configFileLocation = Path.GetFullPath("../../BentoConfiguration.json");
 
-//if (Debugger.IsAttached)
-//{
-//    configFileLocation = Path.GetFullPath("../../BentoConfiguration.json");
-//}
-
 builder.Configuration.AddJsonFile(configFileLocation);
+
+Service? messageBushostConfiguration = ConfigurationHandler.GetServiceFromConfiguration(builder.Configuration, "MessageBusHost") 
+                                       ?? throw new Exception("Failed to find MessageBusHost configuration");
 
 Log.Logger = new LoggerConfiguration()
             .ReadFrom
-            .Configuration(builder.Configuration)
+            .Configuration(messageBushostConfiguration.Configuration)
             .CreateLogger();
 
 builder.Logging.ClearProviders();

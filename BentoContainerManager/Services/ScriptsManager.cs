@@ -40,12 +40,12 @@ public static class ScriptsManager
 
         foreach (var service in services)
         {
-            if (service.ServiceType == ServiceType.dotnet)
+            if (service.ProjectEnvironment == ProjectEnvironment.dotnet)
             {
-                var serviceName = service.ServiceName;
+                var serviceName = service.ProjectName;
                 if (platform == Platform.Windows)
                 {
-                    scriptContent.Add($"# Start {service.ServiceName}");
+                    scriptContent.Add($"# Start {service.ProjectName}");
                     scriptContent.Add($"Start-Job -ScriptBlock {{");
                     scriptContent.Add($"    Set-Location '/app/Services/{serviceName}'");
                     scriptContent.Add($"    dotnet {serviceName}.dll");
@@ -53,7 +53,7 @@ public static class ScriptsManager
                 }
                 else
                 {
-                    scriptContent.Add($"# Start {service.ServiceName}");
+                    scriptContent.Add($"# Start {service.ProjectName}");
                     scriptContent.Add($"cd /app/Services/{serviceName}");
                     scriptContent.Add($"dotnet {serviceName}.dll &");
                 }
