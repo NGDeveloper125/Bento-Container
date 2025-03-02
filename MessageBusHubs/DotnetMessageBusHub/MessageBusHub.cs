@@ -3,6 +3,7 @@ using System.Text.Json;
 using NetMQ;
 using NetMQ.Sockets;
 using DotnetSharedEntities;
+using DotnetSharedEntities.MessageBusModels;
 
 namespace DotnetMessageBusHub;
 

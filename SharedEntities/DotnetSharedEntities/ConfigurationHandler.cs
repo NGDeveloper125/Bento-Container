@@ -7,13 +7,43 @@ namespace DotnetSharedEntities;
 public class ConfigurationHandler
 {
 
-    public static ServiceConfig? GetServiceFromConfiguration(IConfiguration configuration, string serviceName)
+    public static Service? GetServiceFromConfiguration(IConfiguration configuration, string serviceName)
     {
         var servicesSection = configuration.GetSection("Services");
-        var services = servicesSection.Get<List<ServiceConfig>>();
 
-        return services is not null ?
-            services.FirstOrDefault(s => s.ServiceName == serviceName) :
-            throw new ArgumentNullException($"Failed to fetch {serviceName} configuration");
+        foreach (var serviceSection in servicesSection.GetChildren())
+        {
+            var service = new Service
+            {
+                ServiceName = serviceSection["ProjectName"]!,
+                ServiceEnvironment = serviceSection["ProjectType"]!,
+                ServiceLocation = serviceSection["ProjectLocation"]!,
+                // Create a subconfiguration for the Configuration section
+                Configuration = serviceSection.GetSection("Configuration")
+            };
+
+            if (service.ServiceName == serviceName) return service;
+        }
+
+        return null;
     }
+
+    public static string GetEnqueuerUri(IConfiguration configuration)
+    {
+        string? enqueuerAddress = configuration["MessageBus:Enqueuer:Address"]
+                            ?? throw new ArgumentNullException("Failed to find enqueuer address for message bus");
+        string? enqueuerPort = configuration["MessageBus:Enqueuer:Port"]
+                                    ?? throw new ArgumentNullException("Failed to find enqueuer port for message bus");
+        return $"tcp://{enqueuerAddress}:{enqueuerPort}";
+    }
+
+    public static string GetDequeuerUri(IConfiguration configuration)
+    {
+        string? dequeuerAddress = configuration["MessageBus:Dequeuer:Address"]
+                            ?? throw new ArgumentNullException("Failed to find enqueuer address for message bus");
+        string? dequeuerPort = configuration["MessageBus:Dequeuer:Port"]
+                                    ?? throw new ArgumentNullException("Failed to find enqueuer port for message bus");
+        return $"tcp://{dequeuerAddress}:{dequeuerPort}";
+    }
+
 }

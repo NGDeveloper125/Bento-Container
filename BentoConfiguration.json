@@ -6,49 +6,65 @@
         "ImageType": "UbuntuLatest",
         "CustomBaseImage": null
     },
+    "MessageBus" : {
+        "Enqueuer": {
+            "Address": "localhost",
+            "Port": "5555"
+        },
+        "Dequeuer": {
+            "Address": "localhost",
+            "Port": "5556"
+        }
+    },
     "Services" : [
         {
-            "ServiceName" : "MessageBusHost",
-            "ServiceType" : "dotnet",
-            "ServiceLocation" : "../MessageBus/MessageBusHost/",
+            "ProjectName" : "MessageBusHost",
+            "ProjectType" : "service",
+            "ProjectEnvironment" : "dotnet",
+            "ProjectLocation" : "../MessageBus/MessageBusHost/",
             "Dependencies" : [
                 "dotnet sdk"
             ],
-            "Enqueuer": {
-                "Address": "localhost",
-                "Port": "5555"
-            },
-            "Dequeuer": {
-                "Address": "localhost",
-                "Port": "5556"
-            },
-            "Serilog": {
-                "Using": [
-                    "Serilog.Sinks.File"
-                ],
-                "MinimumLevel": {
-                    "Default": "Debug",
-                    "Override": {
-                    "Microsoft": "Warning",
-                    "System": "Warning"
-                    }
-                },
-                "WriteTo": [
-                    {
-                    "Name": "File",
-                    "Args": {
-                        "path": "logs/log-.txt",
-                        "rollingInterval": "Day",
-                        "outputTemplate": "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level}] {Message}{NewLine}{Exception}"
-                    }
-                    }
-                ],
-            "Enrich": [
-                "FromLogContext",
-                "WithMachineName",
-                "WithThreadId"
-                ]
+            "Configuration" : {
+                "Serilog": {
+                    "Using": [
+                        "Serilog.Sinks.File"
+                    ],
+                    "MinimumLevel": {
+                        "Default": "Debug",
+                        "Override": {
+                        "Microsoft": "Warning",
+                        "System": "Warning"
+                        }
+                    },
+                    "WriteTo": [
+                        {
+                        "Name": "File",
+                        "Args": {
+                            "path": "logs/log-.txt",
+                            "rollingInterval": "Day",
+                            "outputTemplate": "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level}] {Message}{NewLine}{Exception}"
+                            }
+                        }
+                    ],
+                "Enrich": [
+                    "FromLogContext",
+                    "WithMachineName",
+                    "WithThreadId"
+                    ]
+                }
             }
+        }
+    ],
+    "Tests" : [
+        {
+            "ProjectName" : "DotnetOrchestrationValidator",
+            "ProjectType" : "test",
+            "ProjectEnvironment" : "dotnet",
+            "ProjectLocation" : "../ContainerOrchestrationValidator/DotnetOrchestrationValidator/",
+            "Dependencies" : [
+                "dotnet sdk"
+            ]
         }
     ]
   }

@@ -3,40 +3,37 @@ using System.Diagnostics;
 
 namespace BentoContainerManager.Services;
 
-public static class ServiceManager
+public static class ProjectPublishManager
 {
     private static readonly string PublishRootPath = Path.Combine(@"../", "publish");
+    private static bool currentIterationStarted = false;
 
-    public static async Task<bool> PrepareServices(Service service)
+    public static async Task<bool> PrepareProject(Project project)
     {
         try
         {
             // Ensure publish directory exists and clean it
-            if (Directory.Exists(PublishRootPath))
-            {
-                Directory.Delete(PublishRootPath, recursive: true);
-            }
-            Directory.CreateDirectory(PublishRootPath);
+            HandlePublishDirectory();
 
-            var servicePublishPath = Path.Combine(PublishRootPath, service.ServiceName);
+            var projectPublishPath = Path.Combine(PublishRootPath, project.ProjectName);
             
-            if (service.ServiceType == ServiceType.dotnet)
+            if (project.ProjectEnvironment == ProjectEnvironment.dotnet)
             {
-                await PublishDotnetService(service, servicePublishPath);
+                await PublishDotnetProject(project, projectPublishPath);
             }
 
             return true;
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error preparing {service.ServiceName}: {ex.Message}");
+            Console.WriteLine($"Error preparing {project.ProjectName}: {ex.Message}");
             return false;
         }
     }
 
-    private static async Task PublishDotnetService(Service service, string publishPath)
+    private static async Task PublishDotnetProject(Project project, string publishPath)
     {
-        var projectPath = Path.GetFullPath(service.ServiceLocation + "/" + service.ServiceName + ".csproj");
+        var projectPath = Path.GetFullPath(project.ProjectLocation + "/" + project.ProjectName + ".csproj");
         Console.WriteLine($"path: {projectPath}");
         if (!File.Exists(projectPath))
         {
@@ -56,7 +53,7 @@ public static class ServiceManager
         using var process = Process.Start(startInfo);
         if (process == null)
         {
-            throw new Exception($"Failed to start publish process for {service.ServiceName}");
+            throw new Exception($"Failed to start publish process for {project.ProjectName}");
         }
 
         // Capture output for logging
@@ -70,9 +67,22 @@ public static class ServiceManager
         
         if (process.ExitCode != 0)
         {
-            throw new Exception($"Failed to publish {service.ServiceName}. Exit code: {process.ExitCode}");
+            throw new Exception($"Failed to publish {project.ProjectName}. Exit code: {process.ExitCode}");
         }
 
-        Console.WriteLine($"Successfully published {service.ServiceName} to {publishPath}");
+        Console.WriteLine($"Successfully published {project.ProjectName} to {publishPath}");
+    }
+
+    private static void HandlePublishDirectory()
+    {
+        if(currentIterationStarted == false)
+        {
+            if (Directory.Exists(PublishRootPath))
+            {
+                Directory.Delete(PublishRootPath, recursive: true);
+            }
+            Directory.CreateDirectory(PublishRootPath);
+            currentIterationStarted = true;
+        }
     }
 }

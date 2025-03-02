@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 
 namespace BentoContainerManager.Models;
 
-public class Service : Project
+public class TestProject : Project
 {
     public override string ProjectName { get; set; } = string.Empty;
     public override string ProjectLocation { get; set; } = string.Empty;
