@@ -46,6 +46,12 @@ public class DockerfileManager
         };
 
         dockerfileContent.AddRange(container.RegisteredDependencies);
+        
+        if(container.Services.Any(service => service.ProjectName == "BusGateway"))
+        {
+            dockerfileContent.Add("RUN dotnet dev-certs https --trust");
+        }
+
         dockerfileContent.Add("WORKDIR /app");
         dockerfileContent.Add("");
 

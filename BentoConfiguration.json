@@ -54,6 +54,48 @@
                     ]
                 }
             }
+        },
+        {
+            "ProjectName" : "BusGateway",
+            "ProjectType" : "service",
+            "ProjectEnvironment" : "dotnet",
+            "ProjectLocation" : "../BusGateway/",
+            "Dependencies" : [
+                "dotnet sdk"
+            ],
+            "Configuration" : {
+                "Authentication": {
+                    "Enabled": true,
+                    "AuthCode": "1234567890"
+                },
+                "Serilog": {
+                    "Using": [
+                        "Serilog.Sinks.File"
+                    ],
+                    "MinimumLevel": {
+                        "Default": "Debug",
+                        "Override": {
+                        "Microsoft": "Warning",
+                        "System": "Warning"
+                        }
+                    },
+                    "WriteTo": [
+                        {
+                        "Name": "File",
+                        "Args": {
+                            "path": "logs/log-.txt",
+                            "rollingInterval": "Day",
+                            "outputTemplate": "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level}] {Message}{NewLine}{Exception}"
+                            }
+                        }
+                    ],
+                "Enrich": [
+                    "FromLogContext",
+                    "WithMachineName",
+                    "WithThreadId"
+                    ]
+                }
+            }
         }
     ],
     "Tests" : [

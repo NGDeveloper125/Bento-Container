@@ -9,29 +9,50 @@ namespace DotnetMessageBusHub;
 
 public class MessageBusHub
 {
-    public async static Task PushMessageToBus<T>(T message, string topic, string enqueuerUri)
+    public async static Task<bool> PushMessageToBus<T>(T message, string topic, string enqueuerUri)
     {
         string serializedMessage = JsonSerializer.Serialize(message);
         MessageWrapper messageWrapper = new MessageWrapper(topic, serializedMessage, null);
 
-        await SendMessage(messageWrapper, enqueuerUri);
+        return await SendMessage(messageWrapper, enqueuerUri);
+    }
+
+    
+    public async static Task<bool> PushMessageToBus(string message, string topic, string enqueuerUri)
+    {
+        MessageWrapper messageWrapper = new MessageWrapper(topic, message, null);
+        return await SendMessage(messageWrapper, enqueuerUri);
     }
     
-    public async static Task PushMessageToBus<T>(T message, Guid id, string enqueuerUri)
+    public async static Task<bool> PushMessageToBus<T>(T message, Guid id, string enqueuerUri)
     {
         string serializedMessage = JsonSerializer.Serialize(message);
-        MessageWrapper messageWrapper = new MessageWrapper(null!, serializedMessage, id);
+        MessageWrapper messageWrapper = new MessageWrapper(null, serializedMessage, id);
 
-        await SendMessage(messageWrapper, enqueuerUri);
+        return await SendMessage(messageWrapper, enqueuerUri);
     }
 
-    private async static Task SendMessage(MessageWrapper message, string enqueuerUri)
+    public async static Task<bool> PushMessageToBus(string message, Guid id, string enqueuerUri)
+    {
+        MessageWrapper messageWrapper = new MessageWrapper(null, message, id);
+        return await SendMessage(messageWrapper, enqueuerUri);
+    }
+
+    private async static Task<bool> SendMessage(MessageWrapper message, string enqueuerUri)
     {
         using(var socket = new RequestSocket(enqueuerUri))
         {
             await Task.Delay(500);
             string serializedMessageWrapper = JsonSerializer.Serialize(message);
             socket.SendFrame(serializedMessageWrapper);
+            
+            await Task.Delay(500);
+            byte[] unusedResponse;
+            if(socket.TryReceiveFrameBytes(TimeSpan.FromSeconds(1), out unusedResponse!))
+            {
+                return true;
+            }   
+            return false;
         }
     }
 

@@ -28,6 +28,9 @@ public class Enqueuer(EnqueuerInfo enqueuerInfo, MessageBus messageBus, ILogger 
                     logger.LogDebug("New push message received");
                     string msg = socket.ReceiveFrameString();
                     byte[] message = socket.ReceiveFrameBytes();
+                    socket.SendMoreFrame(routingKey);
+                    socket.SendMoreFrameEmpty();
+                    socket.SendFrame("");
                     HandleNewMessage(message);
                 }
             }
