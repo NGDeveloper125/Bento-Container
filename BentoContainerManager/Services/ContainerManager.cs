@@ -117,7 +117,7 @@ public class ContainerManager
         var startInfo = new ProcessStartInfo
         {
             FileName = "docker",
-            Arguments = $"run -d --name {containerName} -v \"{infrastructurePath}:/app\" {containerName}",
+            Arguments = $"run -d --name {containerName} -p 7229:7229 -p 7228:7228 -v \"{infrastructurePath}:/app\" {containerName}",
             RedirectStandardOutput = true,
             RedirectStandardError = true,
             UseShellExecute = false,
