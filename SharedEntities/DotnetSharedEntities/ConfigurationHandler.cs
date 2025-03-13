@@ -45,5 +45,4 @@ public class ConfigurationHandler
                                     ?? throw new ArgumentNullException("Failed to find enqueuer port for message bus");
         return $"tcp://{dequeuerAddress}:{dequeuerPort}";
     }
-
 }

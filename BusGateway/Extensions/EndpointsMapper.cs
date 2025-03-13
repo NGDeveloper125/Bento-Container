@@ -13,5 +13,9 @@ public static class EndpointsMapper
         app.MapPost("/PostIdMessage", async (PostMessageService postMessageService, HttpContext context) => {
             return await postMessageService.PostMessageToBus(context, false);
         });
+
+        app.MapGet("/HealthCheck", () => {
+            return Results.Ok();
+        });
     }
 }
