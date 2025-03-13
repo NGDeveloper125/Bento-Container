@@ -33,6 +33,10 @@ public static class ProjectPublishManager
 
     private static async Task PublishDotnetProject(Project project, string publishPath)
     {
+        if(project.ProjectName == "BusGateway")
+        {
+            HandleBusGateway(project);
+        }
         var projectPath = Path.GetFullPath(project.ProjectLocation + "/" + project.ProjectName + ".csproj");
         Console.WriteLine($"path: {projectPath}");
         if (!File.Exists(projectPath))
@@ -83,6 +87,23 @@ public static class ProjectPublishManager
             }
             Directory.CreateDirectory(PublishRootPath);
             currentIterationStarted = true;
+        }
+    }
+
+    private static void HandleBusGateway(Project project)
+    {
+        try
+        {
+            Service busGatewayService = project as Service;
+            string httpUrl = $"http://0.0.0.0:{busGatewayService.Configuration["HostSettings:HttpPort"]}";
+            string httpsUrl = $"https://0.0.0.0:{busGatewayService.Configuration["HostSettings:HttpsPort"]}";
+            string appSettingsContent = File.ReadAllText(Path.Combine(project.ProjectLocation, "appsettings.json"));
+            string newAppSettingsContent = appSettingsContent.Replace("{httpUrl}", httpUrl).Replace("{httpsUrl}", httpsUrl);
+            File.WriteAllText(Path.Combine(project.ProjectLocation, "appsettings.json"), newAppSettingsContent);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error preparing BusGateway appsettings: {ex.Message}");
         }
     }
 }

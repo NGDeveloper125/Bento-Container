@@ -22,9 +22,7 @@
             "ProjectType" : "service",
             "ProjectEnvironment" : "dotnet",
             "ProjectLocation" : "../MessageBus/MessageBusHost/",
-            "Dependencies" : [
-                "dotnet sdk"
-            ],
+            "Dependencies" : "dotnet sdk",
             "Configuration" : {
                 "Serilog": {
                     "Using": [
@@ -60,13 +58,16 @@
             "ProjectType" : "service",
             "ProjectEnvironment" : "dotnet",
             "ProjectLocation" : "../BusGateway/",
-            "Dependencies" : [
-                "dotnet sdk"
-            ],
+            "Dependencies" : "dotnet sdk",
             "Configuration" : {
                 "Authentication": {
                     "Enabled": true,
                     "AuthCode": "1234567890"
+                },
+                "HostSettings" : {
+                    "BaseUrl": "127.0.0.1",
+                    "HttpPort" : "7229",
+                    "HttpsPort" : "7228"
                 },
                 "Serilog": {
                     "Using": [
@@ -104,9 +105,7 @@
             "ProjectType" : "test",
             "ProjectEnvironment" : "dotnet",
             "ProjectLocation" : "../ContainerOrchestrationValidator/DotnetOrchestrationValidator/",
-            "Dependencies" : [
-                "dotnet sdk"
-            ]
+            "Dependencies" : "dotnet sdk"
         }
     ]
   }
