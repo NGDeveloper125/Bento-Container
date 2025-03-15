@@ -24,19 +24,23 @@ jobs:
     - name: Setup Docker
       uses: docker/setup-buildx-action@v2
 
+    - name: Prepare Environment
+      run: |
+        pwd
+        ls -la
+        cp BentoConfiguration.json BentoContainerManager/
+        cd BentoContainerManager
+        ls -la
+
     - name: Build BentoContainerManager
       run: |
         cd BentoContainerManager
         dotnet build
         dotnet publish -c Release -o publish
-        cp ../BentoConfiguration.json publish/
+        cp BentoConfiguration.json publish/
 
     - name: Run Container and Tests
+      working-directory: BentoContainerManager/publish
       run: |
-        cd BentoContainerManager/publish
+        set -e
         ./BentoContainerManager up
-        if [ $? -ne 0 ]; then
-          echo "Container manager failed"
-          exit 1
-        fi
-      shell: bash
