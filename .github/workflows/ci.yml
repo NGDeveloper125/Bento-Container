@@ -29,6 +29,8 @@ jobs:
         pwd
         ls -la
         cp BentoConfiguration.json BentoContainerManager/
+        cp start-services.sh BentoContainerManager/
+        chmod +x BentoContainerManager/start-services.sh
         cd BentoContainerManager
         ls -la
 
@@ -38,9 +40,11 @@ jobs:
         dotnet build
         dotnet publish -c Release -o publish
         cp BentoConfiguration.json publish/
+        cp start-services.sh publish/
+        chmod +x publish/start-services.sh
 
     - name: Run Container and Tests
       working-directory: BentoContainerManager/publish
       run: |
         set -e
-        ./BentoContainerManager up
+        ./BentoContainerManager up || exit 1
