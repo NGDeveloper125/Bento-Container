@@ -1,0 +1,33 @@
+name: Bento Container CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 8.0.x
+
+    - name: Setup Docker
+      uses: docker/setup-buildx-action@v2
+
+    - name: Build BentoContainerManager
+      run: |
+        cd BentoContainerManager
+        dotnet build
+        dotnet publish -c Release -o publish
+
+    - name: Run Container and Tests
+      run: |
+        cd BentoContainerManager/publish
+        ./BentoContainerManager up

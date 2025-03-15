@@ -50,7 +50,7 @@ public class Program
     {
         OperationSystem operationSystem = IdentifyOperationSystem();
         Console.WriteLine("Starting to generate container...");
-        container = await ConfigurationHandler.GetContainerFromConfig(operationSystem);
+        container = await ConfigurationHandler.GetContainerFromConfig();
         if(!container.IsValid())
         {
             Console.Error.WriteLine("Invalid container configuration");

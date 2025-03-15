@@ -12,7 +12,7 @@ public class ConfigurationHandler
     public async static Task<Container> GetContainerFromConfig(OperationSystem operationSystem)
     {
         Console.WriteLine("Getting container configuration...");
-        string configFilePath = GenerateConfigFilePath(operationSystem);
+        string configFilePath = Path.GetFullPath("../BentoConfiguration.json");
         try
         {
             IConfiguration configuration = new ConfigurationBuilder()
