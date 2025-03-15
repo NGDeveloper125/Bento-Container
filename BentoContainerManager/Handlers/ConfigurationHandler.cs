@@ -9,10 +9,10 @@ namespace BentoContainerManager.Handlers;
 
 public class ConfigurationHandler
 {
-    public async static Task<Container> GetContainerFromConfig()
+    public async static Task<Container> GetContainerFromConfig(OperationSystem operationSystem)
     {
         Console.WriteLine("Getting container configuration...");
-        string configFilePath = Path.GetFullPath("../BentoConfiguration.json");
+        string configFilePath = FindConfigurationFile(operationSystem);
         try
         {
             IConfiguration configuration = new ConfigurationBuilder()
@@ -88,5 +88,23 @@ public class ConfigurationHandler
             tests.Add(testProject);
         }
         return tests;
+    }
+
+    private static string FindConfigurationFile(OperationSystem operationSystem)
+    {
+        string currentDirectoryName;
+        string levelsUp = string.Empty;
+        do
+        {
+            string path = Path.GetFullPath($"{levelsUp}BentoConfiguration.json");
+            if(File.Exists(path))
+            {
+                return path;
+            }
+            levelsUp = $"../{levelsUp}";
+            string[] splitPath = operationSystem == OperationSystem.Windows ? path.Split('\\') : path.Split('/');
+            currentDirectoryName = splitPath[splitPath.Length - 2];
+        } while(currentDirectoryName != "Bento-Container");
+        throw new Exception("BentoConfiguration.json not found");
     }
 }
