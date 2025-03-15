@@ -27,8 +27,11 @@ jobs:
     - name: Create start-services script
       run: |
         echo '#!/bin/bash' > start-services.sh
+        echo 'set -e' >> start-services.sh
+        echo 'echo "Starting MessageBusHost..."' >> start-services.sh
         echo 'cd /app/Services/MessageBusHost' >> start-services.sh
-        echo 'dotnet MessageBusHost.dll' >> start-services.sh
+        echo 'ls -la' >> start-services.sh
+        echo 'dotnet MessageBusHost.dll || { echo "Failed to start MessageBusHost"; exit 1; }' >> start-services.sh
         chmod +x start-services.sh
 
     - name: Prepare Environment
@@ -49,7 +52,9 @@ jobs:
       run: |
         set -e
         ./BentoContainerManager up || exit 1
-        sleep 10  # Wait for container to start
-        docker logs testcontainer --tail 50
-        docker ps
-        docker exec testcontainer ls -la /app/Tests
+        echo "Waiting for container to start..."
+        sleep 5
+        echo "Container logs:"
+        docker logs testcontainer || true
+        echo "Running containers:"
+        docker ps -a
