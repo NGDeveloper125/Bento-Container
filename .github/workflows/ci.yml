@@ -24,15 +24,17 @@ jobs:
     - name: Setup Docker
       uses: docker/setup-buildx-action@v2
 
+    - name: Create start-services script
+      run: |
+        echo '#!/bin/bash' > start-services.sh
+        echo 'cd /app/Services/MessageBusHost' >> start-services.sh
+        echo 'dotnet MessageBusHost.dll' >> start-services.sh
+        chmod +x start-services.sh
+
     - name: Prepare Environment
       run: |
-        pwd
-        ls -la
         cp BentoConfiguration.json BentoContainerManager/
         cp start-services.sh BentoContainerManager/
-        chmod +x BentoContainerManager/start-services.sh
-        cd BentoContainerManager
-        ls -la
 
     - name: Build BentoContainerManager
       run: |
@@ -40,8 +42,7 @@ jobs:
         dotnet build
         dotnet publish -c Release -o publish
         cp BentoConfiguration.json publish/
-        cp start-services.sh publish/
-        chmod +x publish/start-services.sh
+        cp ../start-services.sh publish/
 
     - name: Run Container and Tests
       working-directory: BentoContainerManager/publish
