@@ -9,7 +9,7 @@ namespace BentoContainerManager.Handlers;
 
 public class ConfigurationHandler
 {
-    public async static Task<Container> GetContainerFromConfig(OperationSystem operationSystem)
+    public async static Task<Container> GetContainerFromConfig()
     {
         Console.WriteLine("Getting container configuration...");
         string configFilePath = Path.GetFullPath("../BentoConfiguration.json");
@@ -48,15 +48,6 @@ public class ConfigurationHandler
             Environment.Exit(1);
             return null;
         }
-    }
-
-    private static string GenerateConfigFilePath(OperationSystem operationSystem)
-    {
-        return operationSystem switch
-        {
-            OperationSystem.Windows => Path.GetFullPath("../BentoConfiguration.json"),
-            OperationSystem.Linux => Path.GetFullPath("..\\BentoConfiguration.json")
-        };
     }
 
     private static List<Service> GetServicesFromConfig(IConfiguration configuration)
