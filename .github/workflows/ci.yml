@@ -49,3 +49,7 @@ jobs:
       run: |
         set -e
         ./BentoContainerManager up || exit 1
+        sleep 10  # Wait for container to start
+        docker logs testcontainer --tail 50
+        docker ps
+        docker exec testcontainer ls -la /app/Tests
