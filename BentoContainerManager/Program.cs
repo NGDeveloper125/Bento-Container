@@ -1,12 +1,14 @@
 ﻿using BentoContainerManager.Handlers;
+using BentoContainerManager.Entities;
 using BentoContainerManager.Extensions;
 using BentoContainerManager.Models;
 using BentoContainerManager.Services;
-using Microsoft.Extensions.Configuration;
 using System.CommandLine;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System;
 
 namespace BentoContainerManager;
 
@@ -46,8 +48,9 @@ public class Program
 
     private static async Task GenerateContainer()
     {
+        OperationSystem operationSystem = IdentifyOperationSystem();
         Console.WriteLine("Starting to generate container...");
-        container = await GetContainerConfig();
+        container = await ConfigurationHandler.GetContainerFromConfig(operationSystem);
         if(!container.IsValid())
         {
             Console.Error.WriteLine("Invalid container configuration");
@@ -62,7 +65,7 @@ public class Program
        await ContainerManager.BuildContainer(container);
     }
 
-        private static async Task StartContainer()
+    private static async Task StartContainer()
     {
         container.Volumes ??= new List<VolumeMount>();
         
@@ -93,72 +96,18 @@ public class Program
         await ContainerManager.SpinUpContainer(container);
     }
 
-    private async static Task<Container> GetContainerConfig()
+    private static OperationSystem IdentifyOperationSystem()
     {
-        Console.WriteLine("Getting container configuration...");
-        try
+        if(RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
-            IConfiguration configuration = new ConfigurationBuilder()
-                .AddJsonFile(Path.GetFullPath("../BentoConfiguration.json"))
-                .Build();
-
-            var services = new List<Service>();
-            var servicesSection = configuration.GetSection("Services");
-            foreach (var serviceSection in servicesSection.GetChildren())
-            {
-                var service = new Service
-                {
-                    ProjectName = serviceSection["ProjectName"]!,
-                    ProjectType = Enum.Parse<ProjectType>(serviceSection["ProjectType"]!),
-                    ProjectEnvironment = Enum.Parse<ProjectEnvironment>(serviceSection["ProjectEnvironment"]!),
-                    ProjectLocation = serviceSection["ProjectLocation"]!,
-                    Dependencies = serviceSection["Dependencies"].Split(',').ToList(),
-                    Configuration = serviceSection.GetSection("Configuration")
-                };
-
-                services.Add(service);
-            }
-
-            var tests = new List<TestProject>();
-            var testsSection = configuration.GetSection("Tests");
-            foreach (var testSection in testsSection.GetChildren())
-            {
-                var testProject = new TestProject
-                {
-                    ProjectName = testSection["ProjectName"]!,
-                    ProjectType = Enum.Parse<ProjectType>(testSection["ProjectType"]!),
-                    ProjectEnvironment = Enum.Parse<ProjectEnvironment>(testSection["ProjectEnvironment"]!),
-                    ProjectLocation = testSection["ProjectLocation"]!,
-                };
-
-                tests.Add(testProject);
-            }
-
-            BaseImage? baseImage = new BaseImage()
-            {
-                Platform = Enum.Parse<Platform>(configuration["BaseImage:Platform"]!),
-                ImageType = Enum.Parse<BaseImageType>(configuration["BaseImage:ImageType"]!),
-                CustomBaseImage = configuration["BaseImage:CustomBaseImage"]
-            };
-
-            Container? container = new Container()
-            {
-                ContainerName = configuration["ContainerName"],
-                ContainerPort = configuration["ContainerPort"],
-                BaseImage = baseImage,
-                Services = services,
-                Tests = tests
-            };
-
-            Console.WriteLine($"Processing {container.ContainerName} configuration");
-            Console.WriteLine($"Container contain: {container.Services.Count} services and {container.Tests.Count} tests");
-            return container;
+            Console.WriteLine("Running on Windows");
+            return OperationSystem.Windows;
         }
-        catch (Exception ex)
+        if(RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
         {
-            Console.Error.WriteLine($"Error: {ex.Message}");
-            Environment.Exit(1);
-            return null;
+            Console.WriteLine("Running on Linux");
+            return OperationSystem.Linux;
         }
+        throw new Exception("Unsupported operating system");
     }
 }

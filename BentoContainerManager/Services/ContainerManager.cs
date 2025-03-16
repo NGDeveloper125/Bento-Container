@@ -149,6 +149,29 @@ public class ContainerManager
         {
             throw new Exception($"Docker run failed with exit code: {process.ExitCode}");
         }
+        
+        // Check if container is actually running
+        var checkInfo = new ProcessStartInfo
+        {
+            FileName = "docker",
+            Arguments = $"ps -f name={containerName} --format {{{{.Status}}}}",
+            RedirectStandardOutput = true,
+            UseShellExecute = false,
+            CreateNoWindow = true
+        };
+
+        using var checkProcess = Process.Start(checkInfo);
+        if (checkProcess != null)
+        {
+            var status = await checkProcess.StandardOutput.ReadToEndAsync();
+            await checkProcess.WaitForExitAsync();
+            
+            if (!status.Contains("Up"))
+            {
+                var logs = await GetContainerLogs(containerName);
+                throw new Exception($"Container failed to stay running. Container logs:\n{logs}");
+            }
+        }
 
         // Give the services some time to start up
         await Task.Delay(5000);
@@ -195,7 +218,29 @@ public class ContainerManager
         Console.WriteLine($"Container {containerName} is running in detached mode");
     }
 
-      private static void CopyDirectory(string sourceDir, string destinationDir)
+    private static async Task<string> GetContainerLogs(string containerName)
+    {
+        var logInfo = new ProcessStartInfo
+        {
+            FileName = "docker",
+            Arguments = $"logs {containerName}",
+            RedirectStandardOutput = true,
+            RedirectStandardError = true,
+            UseShellExecute = false,
+            CreateNoWindow = true
+        };
+
+        using var logProcess = Process.Start(logInfo);
+        if (logProcess == null) return "Failed to get logs";
+
+        var output = await logProcess.StandardOutput.ReadToEndAsync();
+        var error = await logProcess.StandardError.ReadToEndAsync();
+        await logProcess.WaitForExitAsync();
+
+        return $"STDOUT:\n{output}\nSTDERR:\n{error}";
+    }
+
+    private static void CopyDirectory(string sourceDir, string destinationDir)
     {
         Directory.CreateDirectory(destinationDir);
 

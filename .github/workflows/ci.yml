@@ -1,0 +1,62 @@
+name: Bento Container CI
+
+on:
+  pull_request:
+    branches: 
+      - main
+      - development_mvp
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 8.0.x
+
+    - name: Setup Docker
+      uses: docker/setup-buildx-action@v2
+      
+    - name: Create start-services script
+      run: |
+        echo '#!/bin/bash' > start-services.sh
+        echo 'set -e' >> start-services.sh
+        echo 'echo "Starting MessageBusHost..."' >> start-services.sh
+        echo 'cd /app/Services/MessageBusHost' >> start-services.sh
+        echo 'ls -la' >> start-services.sh
+        echo 'dotnet MessageBusHost.dll &' >> start-services.sh
+        echo 'echo "MessageBusHost started in background"' >> start-services.sh
+        echo 'sleep infinity' >> start-services.sh
+        chmod +x start-services.sh
+
+    - name: Prepare Environment
+      run: |
+        cp BentoConfiguration.json BentoContainerManager/
+        cp start-services.sh BentoContainerManager/
+
+    - name: Build BentoContainerManager
+      run: |
+        cd BentoContainerManager
+        dotnet build
+        dotnet publish -c Release -o publish
+        cp BentoConfiguration.json publish/
+        cp ../start-services.sh publish/
+
+    - name: Run Container and Tests
+      working-directory: BentoContainerManager/publish
+      run: |
+        set -e
+        ./BentoContainerManager up || exit 1
+        echo "Waiting for container to start..."
+        sleep 5
+        echo "Container logs:"
+        docker logs testcontainer || true
+        echo "Running containers:"
+        docker ps -a
