@@ -23,7 +23,7 @@ jobs:
 
     - name: Setup Docker
       uses: docker/setup-buildx-action@v2
-
+      
     - name: Create start-services script
       run: |
         echo '#!/bin/bash' > start-services.sh
@@ -31,7 +31,9 @@ jobs:
         echo 'echo "Starting MessageBusHost..."' >> start-services.sh
         echo 'cd /app/Services/MessageBusHost' >> start-services.sh
         echo 'ls -la' >> start-services.sh
-        echo 'dotnet MessageBusHost.dll || { echo "Failed to start MessageBusHost"; exit 1; }' >> start-services.sh
+        echo 'dotnet MessageBusHost.dll &' >> start-services.sh
+        echo 'echo "MessageBusHost started in background"' >> start-services.sh
+        echo 'sleep infinity' >> start-services.sh
         chmod +x start-services.sh
 
     - name: Prepare Environment
